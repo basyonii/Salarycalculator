@@ -223,6 +223,23 @@
             background: #ffffff;
             font-weight: 500;
         }
+        
+        .whatsapp-link {
+            margin-top: 5px;
+        }
+        
+        .whatsapp-link a {
+            color: #075e54;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .whatsapp-link a:hover {
+            text-decoration: underline;
+            color: #128C7E;
+        }
 
         small {
             color: #6c757d;
@@ -241,7 +258,6 @@
     </div>
 
     <div class="content-grid">
-        <!-- اللوحة الصفراء: المدخلات -->
         <div class="inputs-panel">
             <div class="input-group">
                 <label id="grossLabel">الراتب الإجمالي الشهري</label>
@@ -257,7 +273,6 @@
             </div>
         </div>
 
-        <!-- اللوحة الخضراء: النتائج -->
         <div class="results-panel">
             <div class="results-grid">
                 <div class="result-card">
@@ -286,31 +301,23 @@
         </div>
     </div>
     
-    <!-- الفوتر -->
-    <div class="footer-note" id="footerText">
-        POWERED BY. MUHAMMAD BASYONIx
-        +201065721537
-    </div>
+    <div class="footer-note" id="footerText"></div>
 </div>
 
 <script>
-    // عناصر DOM
     const grossInput = document.getElementById('grossSalaryInput');
     const insuranceSalaryInput = document.getElementById('insuranceSalaryInput');
     
-    // عناصر العرض
     const socialInsuranceSpan = document.getElementById('socialInsuranceValue');
     const taxSpan = document.getElementById('taxValue');
     const terrorismFundSpan = document.getElementById('terrorismFundValue');
     const totalDeductionsSpan = document.getElementById('totalDeductionsValue');
     const netSalarySpan = document.getElementById('netSalaryValue');
     
-    // دالة تنسيق الأرقام إنجليزي (مثال: 12,500.00)
     function formatMoney(value) {
         return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
     }
     
-    // شرائح الضريبة حسب القانون المصري
     function calculateAnnualTax(taxableIncome) {
         if (taxableIncome <= 0) return 0;
         
@@ -380,7 +387,6 @@
         }
     }
     
-    // ------------------- الترجمة -------------------
     let currentLang = 'ar';
     
     const translations = {
@@ -433,12 +439,13 @@
         document.getElementById('terrorTooltip').textContent = t.terrorTooltip;
         document.getElementById('totalDedLabel').textContent = t.totalDedLabel;
         document.getElementById('netLabel').textContent = t.netLabel;
-        document.getElementById('footerText').textContent = t.footer;
+        
+        const footerDiv = document.getElementById('footerText');
+        footerDiv.innerHTML = `${t.footer}<div class="whatsapp-link"><a href="https://wa.me/201065721537" target="_blank">+201065721537</a></div>`;
         
         const langBtn = document.getElementById('langSwitchBtn');
         langBtn.textContent = currentLang === 'ar' ? 'EN' : 'عربي';
         
-        // تحديث اتجاه الصفحة
         if (currentLang === 'ar') {
             document.documentElement.setAttribute('dir', 'rtl');
             document.documentElement.setAttribute('lang', 'ar');
@@ -451,7 +458,6 @@
             if (langToggleDiv) langToggleDiv.style.left = 'auto';
         }
         
-        // إعادة عرض رسالة الخطأ باللغة الجديدة
         updateAllCalculations();
     }
     
@@ -462,7 +468,6 @@
     
     document.getElementById('langSwitchBtn').addEventListener('click', toggleLanguage);
     
-    // ربط الأحداث
     grossInput.addEventListener('input', updateAllCalculations);
     insuranceSalaryInput.addEventListener('input', updateAllCalculations);
     
