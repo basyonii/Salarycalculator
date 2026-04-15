@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>حاسبة الراتب - التأمينات والضريبة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', system-ui, 'Cairo', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f7 0%, #dce5ed 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calculator-container {
+            max-width: 1100px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #1e3c4c;
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.85;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .content-grid {
+            padding: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .inputs-panel {
+            flex: 1.2;
+            min-width: 280px;
+            background: #fef9e6;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            border-right: 6px solid #f5b042;
+        }
+
+        .input-group {
+            margin-bottom: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-weight: 700;
+            color: #2c3e2f;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .yellow-field {
+            background-color: #fff2cc;
+            border: 2px solid #f5b042;
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: 0.2s;
+            outline: none;
+            width: 100%;
+            text-align: left;
+            direction: ltr;
+        }
+
+        .yellow-field:focus {
+            border-color: #e68a2e;
+            box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.3);
+            background-color: #fff6e0;
+        }
+
+        .validation-message {
+            font-size: 0.8rem;
+            margin-top: 6px;
+            font-weight: 500;
+            color: #c7254e;
+            background: #ffe6e9;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .results-panel {
+            flex: 1.8;
+            min-width: 380px;
+            background: #f5faf5;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            border-right: 6px solid #2e8b57;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 0.9rem 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #e0f0e0;
+        }
+
+        .result-card .label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #2b6e43;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-card .value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1e4620;
+            word-break: break-word;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .info-tooltip {
+            font-size: 0.7rem;
+            color: #5a626e;
+            margin-top: 6px;
+        }
+
+        .net-salary {
+            background: #d4efdf;
+            border-right: 5px solid #1e7e34;
+        }
+
+        .net-salary .value {
+            color: #0a5c2e;
+            font-size: 1.9rem;
+        }
+
+        .deductions-card {
+            background: #ffe6e6;
+            border: 1px solid #e0b4b4;
+            border-right: 5px solid #c0392b;
+        }
+
+        .deductions-card .label {
+            color: #a93226;
+        }
+
+        .deductions-card .value {
+            color: #c0392b;
+        }
+
+        .footer-note {
+            text-align: center;
+            padding: 0.85rem;
+            color: #6c757d;
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+            border-top: 1px solid #e9ecef;
+            background: #ffffff;
+            font-weight: 500;
+        }
+
+        @media (max-width: 780px) {
+            .content-grid {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            .result-card .value {
+                font-size: 1.3rem;
+            }
+        }
+
+        small {
+            color: #6c757d;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+<div class="calculator-container">
+    <div class="header">
+        <h1>حاسبة الراتب - التأمينات والضريبة</h1>
+        <p>الراتب الإجمالي | الأجر التأميني | صافي الراتب المحول للبنك</p>
+    </div>
+
+    <div class="content-grid">
+        <!-- اللوحة الصفراء: المدخلات -->
+        <div class="inputs-panel">
+            <div class="input-group">
+                <label>الراتب الإجمالي الشهري</label>
+                <input type="number" id="grossSalaryInput" class="yellow-field" value="0" step="100">
+                <small>الراتب قبل أي استقطاعات</small>
+            </div>
+
+            <div class="input-group">
+                <label>الأجر التأميني</label>
+                <input type="number" id="insuranceSalaryInput" class="yellow-field" value="2700" step="100">
+                <div id="insuranceErrorMsg" class="validation-message" style="display: none;"></div>
+                <small>الحد الأدنى 2700 والحد الأقصى 16700 (حصة العامل = 11% من هذا المبلغ)</small>
+            </div>
+        </div>
+
+        <!-- اللوحة الخضراء: النتائج -->
+        <div class="results-panel">
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="label">حصة العامل في التأمينات الاجتماعية</div>
+                    <div class="value" id="socialInsuranceValue">0.00</div>
+                    <div class="info-tooltip">= 11% × الأجر التأميني</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">ضريبة كسب العمل</div>
+                    <div class="value" id="taxValue">0.00</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">صندوق ضحايا الإرهاب</div>
+                    <div class="value" id="terrorismFundValue">0.00</div>
+                    <div class="info-tooltip">0.05% من الراتب الإجمالي الشهري</div>
+                </div>
+                <div class="result-card deductions-card" id="totalDeductionsCard">
+                    <div class="label">إجمالي الاستقطاعات</div>
+                    <div class="value" id="totalDeductionsValue">0.00</div>
+                </div>
+                <div class="result-card net-salary">
+                    <div class="label">الراتب الصافي المحول للبنك</div>
+                    <div class="value" id="netSalaryValue">0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الفوتر -->
+    <div class="footer-note">
+        POWERED BY. MUHAMMAD BASYONI
+    </div>
+</div>
+
+<script>
+    // عناصر DOM
+    const grossInput = document.getElementById('grossSalaryInput');
+    const insuranceSalaryInput = document.getElementById('insuranceSalaryInput');
+    
+    // عناصر العرض
+    const socialInsuranceSpan = document.getElementById('socialInsuranceValue');
+    const taxSpan = document.getElementById('taxValue');
+    const terrorismFundSpan = document.getElementById('terrorismFundValue');
+    const totalDeductionsSpan = document.getElementById('totalDeductionsValue');
+    const netSalarySpan = document.getElementById('netSalaryValue');
+    
+    // دالة تنسيق الأرقام إنجليزي (مثال: 12,500.00)
+    function formatMoney(value) {
+        return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+    }
+    
+    // شرائح الضريبة حسب القانون المصري
+    function calculateAnnualTax(taxableIncome) {
+        if (taxableIncome <= 0) return 0;
+        
+        // أول 40,000 معفاة
+        if (taxableIncome <= 40000) return 0;
+        
+        // 40,001 - 55,000 : 10%
+        if (taxableIncome <= 55000) {
+            return (taxableIncome - 40000) * 0.10;
+        }
+        // 55,001 - 70,000 : 1500 + 15%
+        if (taxableIncome <= 70000) {
+            return 1500 + (taxableIncome - 55000) * 0.15;
+        }
+        // 70,001 - 200,000 : 3750 + 20%
+        if (taxableIncome <= 200000) {
+            return 3750 + (taxableIncome - 70000) * 0.20;
+        }
+        // 200,001 - 400,000 : 29750 + 22.5%
+        if (taxableIncome <= 400000) {
+            return 29750 + (taxableIncome - 200000) * 0.225;
+        }
+        // 400,001 - 600,000 : 74750 + 25%
+        if (taxableIncome <= 600000) {
+            return 74750 + (taxableIncome - 400000) * 0.25;
+        }
+        // 600,001 - 700,000 : 78750 + 25%
+        if (taxableIncome <= 700000) {
+            return 78750 + (taxableIncome - 400000) * 0.25;
+        }
+        // 700,001 - 800,000 : 81500 + 25%
+        if (taxableIncome <= 800000) {
+            return 81500 + (taxableIncome - 400000) * 0.25;
+        }
+        // 800,001 - 900,000 : 85000 + 25%
+        if (taxableIncome <= 900000) {
+            return 85000 + (taxableIncome - 400000) * 0.25;
+        }
+        // 900,001 - 1,200,000 : 90000 + 25%
+        if (taxableIncome <= 1200000) {
+            return 90000 + (taxableIncome - 400000) * 0.25;
+        }
+        // أكثر من 1,200,000 : 300,000 + 27.5%
+        return 300000 + (taxableIncome - 1200000) * 0.275;
+    }
+    
+    function updateAllCalculations() {
+        // قراءة المدخلات
+        let grossMonthly = parseFloat(grossInput.value);
+        if (isNaN(grossMonthly) || grossMonthly < 0) grossMonthly = 0;
+        
+        let insuranceSalary = parseFloat(insuranceSalaryInput.value);
+        if (isNaN(insuranceSalary) || insuranceSalary < 0) insuranceSalary = 0;
+        
+        // تطبيق حدود الأجر التأميني
+        let validatedInsuranceSalary = insuranceSalary;
+        let insuranceSalaryError = false;
+        if (insuranceSalary < 2700) {
+            validatedInsuranceSalary = 2700;
+            insuranceSalaryError = true;
+        }
+        if (insuranceSalary > 16700) {
+            validatedInsuranceSalary = 16700;
+            insuranceSalaryError = true;
+        }
+        
+        const insuranceErrorDiv = document.getElementById('insuranceErrorMsg');
+        if (insuranceSalaryError) {
+            insuranceErrorDiv.style.display = 'block';
+            insuranceErrorDiv.textContent = `⚠️ الأجر التأميني خارج النطاق (2700 - 16700) ، تم تعديله إلى ${validatedInsuranceSalary.toLocaleString('en-US')}`;
+        } else {
+            insuranceErrorDiv.style.display = 'none';
+        }
+        
+        const finalInsuranceSalary = validatedInsuranceSalary;
+        
+        // 1. حصة العامل في التأمينات الاجتماعية = 11% من الأجر التأميني
+        const socialInsurance = finalInsuranceSalary * 0.11;
+        
+        // 2. الراتب الشاغلي = الراتب الإجمالي - حصة التأمينات
+        const positionSalary = grossMonthly - socialInsurance;
+        
+        // 3. الأجر السنوي الخاضع للضريبة = (الراتب الشاغلي × 12) - 20,000 إعفاء
+        const taxableAnnualSalary = (positionSalary * 12) - 20000;
+        const finalTaxableIncome = taxableAnnualSalary > 0 ? taxableAnnualSalary : 0;
+        
+        // 4. حساب الضريبة السنوية ثم الشهرية
+        const annualTax = calculateAnnualTax(finalTaxableIncome);
+        const monthlyTax = annualTax / 12;
+        
+        // 5. صندوق ضحايا الإرهاب = 0.05% من الراتب الإجمالي
+        const terrorismFund = grossMonthly * 0.0005;
+        
+        // 6. إجمالي الاستقطاعات
+        const totalDeductions = socialInsurance + monthlyTax + terrorismFund;
+        
+        // 7. صافي الراتب
+        let netSalary = grossMonthly - totalDeductions;
+        if (netSalary < 0) netSalary = 0;
+        
+        // تحديث الواجهة
+        socialInsuranceSpan.textContent = formatMoney(socialInsurance);
+        taxSpan.textContent = formatMoney(monthlyTax);
+        terrorismFundSpan.textContent = formatMoney(terrorismFund);
+        totalDeductionsSpan.textContent = formatMoney(totalDeductions);
+        netSalarySpan.textContent = formatMoney(netSalary);
+        
+        if (netSalary < grossMonthly * 0.3 && grossMonthly > 0) {
+            netSalarySpan.style.color = "#b34e1a";
+        } else {
+            netSalarySpan.style.color = "#0a5c2e";
+        }
+    }
+    
+    // ربط الأحداث
+    grossInput.addEventListener('input', updateAllCalculations);
+    insuranceSalaryInput.addEventListener('input', updateAllCalculations);
+    
+    insuranceSalaryInput.addEventListener('blur', function() {
+        let val = parseFloat(insuranceSalaryInput.value);
+        if (!isNaN(val)) {
+            if (val < 2700) insuranceSalaryInput.value = 2700;
+            else if (val > 16700) insuranceSalaryInput.value = 16700;
+            updateAllCalculations();
+        } else {
+            insuranceSalaryInput.value = 2700;
+            updateAllCalculations();
+        }
+    });
+    
+    updateAllCalculations();
+</script>
+</body>
+</html>
